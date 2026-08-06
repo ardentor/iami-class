@@ -1,0 +1,165 @@
+/* 우주 배경 — 원데이클래스 안내·신청 페이지 공용.
+   영상 파일이 아니라 그려서 만든다. 짧은 루프 영상은 아무리 느려도
+   되감기는 순간이 눈에 띄는데, 우주는 끝없이 흘러야 우주로 보이기 때문이다.
+
+   ── 폰에서 번쩍이던 문제 (2026-08-03, 세 번째 수정에서 잡음) ────────────────
+   원인은 어느 한 줄이 아니라 「움직이는 큰 층이 여섯 겹」이라는 구조 자체였다.
+   화면보다 큰 층 여섯 겹을 폰 GPU 가 동시에 들고 있지 못해, 밀려난 층이 잠깐
+   비고 그 사이로 바탕색이 보인다 — 그게 흰색·검정색 번쩍임의 정체다.
+   (첫 수정에서 바탕색을 흰색→검정으로 바꾸자 번쩍이는 색만 따라 바뀐 것이 증거다.)
+
+   → 움직이는 층을 여섯에서 **둘**로 줄였다. 은하수·성운·바탕은 전부 .space 한 겹에
+     그려 넣어 아예 움직이지 않게 했다. 70~190초에 걸친 움직임이라 눈에 띄지 않는다.
+     흐르는 별밭, 은하수 띠, 성운 색, 유성 — 보이는 것은 그대로다.
+   🚫 층을 다시 늘리지 않는다. 늘리는 순간 번쩍임이 돌아온다.
+   ────────────────────────────────────────────────────────────────── */
+
+/* 브라우저가 이 화면을 밝은 화면으로 알고 있으면 스크롤 끝의 잔광, 새로고침 배경,
+   기본 입력칸까지 흰색으로 칠한다. 시스템 설정을 그대로 따르게 알려 준다. */
+:root{color-scheme:light dark}
+
+/* 🔴 z-index 를 음수로 두지 않는다. 음수로 두면 배경이 「본문보다 뒤」가 되어,
+   폰 브라우저가 이 층을 따로 붙들지 못하고 스크롤하는 본문과 한 덩어리로 묶는다.
+   → 배경은 0 에 두고 본문을 1 로 올려 순서를 만든다. 보이는 결과는 같다. */
+.space{
+  position:fixed; left:0; right:0; top:0; z-index:0; overflow:hidden; pointer-events:none;
+  /* 🔴 높이를 100% 나 inset:0 으로 잡지 않는다. 폰에서 스크롤을 내리면 주소창이
+     접히며 화면 높이가 커지고, 그때마다 이 층이 통째로 다시 그려진다.
+     lvh 는 주소창이 접힌 상태의 높이로 고정돼 스크롤 중에 바뀌지 않는다. */
+  height:100vh; height:100lvh;
+  transform:translateZ(0);          /* 합성 층으로 한 번 못박는다 */
+  opacity:0; transition:opacity 1.6s var(--ease);
+
+  /* 바탕 · 은하수 · 성운을 한 겹에 그린다 — 여기는 움직이지 않으므로
+     한 번 그리고 나면 스크롤이 아무리 길어도 다시 그리지 않는다.
+     라이트 화면은 글자가 검정이라 완전히 어둡게는 못 깐다. 대신 밤이 걷히기
+     직전 하늘까지 내린다 — 본문 글자(#1a1b21)와 대비는 12:1 이상이다.
+     ⚠️ 목록에서 위에 적힌 것이 위에 깔린다. 바탕색이 맨 아래다. */
+  background:
+    linear-gradient(102deg,
+      transparent 33%,
+      rgba(122,146,224,.10) 42%,
+      rgba(150,170,235,.17) 50%,
+      rgba(122,146,224,.10) 58%,
+      transparent 67%),
+    radial-gradient(62% 44% at 28% 33%, rgba(20,86,240,.26),  transparent 72%),
+    radial-gradient(56% 40% at 75% 66%, rgba(234,94,193,.20), transparent 72%),
+    radial-gradient(50% 36% at 63% 15%, rgba(96,165,250,.20), transparent 70%),
+    radial-gradient(54% 42% at 17% 81%, rgba(234,94,193,.15), transparent 70%),
+    radial-gradient(124% 88% at 50% -12%, #e4e8f8 0%, #d1d7ee 46%, #c2c9e5 100%);
+}
+.space.on{opacity:1}
+
+@media (prefers-color-scheme:dark){
+  /* 다크 화면에서는 끝까지 간다 */
+  .space{
+    background:
+      linear-gradient(102deg,
+        transparent 31%,
+        rgba(150,175,255,.10) 40%,
+        rgba(214,226,255,.20) 50%,
+        rgba(150,175,255,.10) 60%,
+        transparent 69%),
+      radial-gradient(62% 44% at 28% 33%, rgba(20,86,240,.50),  transparent 72%),
+      radial-gradient(56% 40% at 75% 66%, rgba(234,94,193,.34), transparent 72%),
+      radial-gradient(50% 36% at 63% 15%, rgba(96,165,250,.32), transparent 70%),
+      radial-gradient(54% 42% at 17% 81%, rgba(234,94,193,.24), transparent 70%),
+      radial-gradient(124% 88% at 50% -12%, #1c2247 0%, #0b0f22 48%, #04050d 100%);
+  }
+}
+
+/* ── 별 두 겹 (움직이는 것은 이 둘뿐이다) ──
+   512px 타일을 반복해 깔고, 정확히 512px 만 움직인 뒤 처음으로 돌아간다.
+   0% 와 100% 의 그림이 완전히 겹치므로 이음매가 원리적으로 생기지 않는다.
+   🔴 이 512 는 bgspace.js 의 T 와 반드시 같아야 한다. */
+.space .stars{
+  position:absolute; left:-512px; top:0;
+  width:calc(100% + 512px); height:calc(100% + 512px);
+  background-repeat:repeat;
+}
+/* 먼 별이 더 느리다 — 그래야 깊이가 생긴다 */
+.space .far { animation:drift 160s linear infinite }
+.space .near{ animation:drift  90s linear infinite }
+@keyframes drift{from{transform:translate3d(0,0,0)} to{transform:translate3d(512px,-512px,0)}}
+
+/* ── 유성 ──
+   가끔 하나 스쳐 지나가는 것만으로 정지 화면이 아니라는 느낌이 확 산다.
+   주기의 대부분은 보이지 않는다 — 17초에 1초쯤만 지나간다.
+   폭 2px 짜리라 층으로 쳐도 비용이 없다.
+   라이트 화면에서는 흰 선이 뜬금없어 보여 켜지 않는다. */
+.space .met{display:none}
+@media (prefers-color-scheme:dark){
+  .space .met{
+    display:block; position:absolute; width:2px; height:120px; opacity:0;
+    background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.85));
+    animation:met 17s linear infinite;
+  }
+  .space .m1{left:72%; top:-14%}
+  .space .m2{left:34%; top:-20%; height:90px; animation-duration:29s; animation-delay:9s}
+}
+@keyframes met{
+  0%  {opacity:0; transform:translate3d(0,0,0) rotate(28deg)}
+  1.5%{opacity:.9}
+  7%  {opacity:0}
+  100%{opacity:0; transform:translate3d(-360px,680px,0) rotate(28deg)}
+}
+
+/* 아래로 갈수록 잠잠해진다 — 신청서는 글이 길어서
+   입력칸 위로 배경이 어른거리면 안 된다.
+   별 위에 덮여야 하므로 이것만은 .space 배경에 합치지 못하고 한 겹으로 남긴다.
+   움직이지 않으므로 한 번 그리고 끝이다. */
+.space i{
+  position:absolute; inset:0; display:block;
+  background:linear-gradient(180deg,
+    color-mix(in srgb, var(--surface) 6%,  transparent) 0%,
+    color-mix(in srgb, var(--surface) 36%, transparent) 52%,
+    color-mix(in srgb, var(--surface) 70%, transparent) 100%);
+}
+
+/* 배경이 켜지면 본문 배경을 걷고, 카드만 살짝 비치게 한다.
+   🔴 transparent 로 두지 않는다. body 배경은 문서 바탕(canvas)으로 전달되는데,
+   투명이면 브라우저 기본값인 흰색으로 돌아간다. 우주 배경은 그 위에 얹힌 층일 뿐이라
+   화면 끝에서 튕길 때·주소창이 여닫힐 때 그 흰색이 그대로 드러난다.
+   같은 계열의 바탕색을 깔아 두면 드러날 흰색 자체가 없다. */
+body.space-on{background:#c5cbe6}
+@media (prefers-color-scheme:dark){ body.space-on{background:#080b16} }
+
+/* 배경을 0 에 두었으므로 본문을 그 위로 올린다. 안 올리면 배경이 글자를 덮는다.
+   하단 고정 버튼(.bar)은 20 이라 그대로 맨 위에 있다. */
+body.space-on .wrap{position:relative; z-index:1}
+body.space-on .card,
+body.space-on .step,
+body.space-on .gift,
+body.space-on .info,
+body.space-on .shop,
+body.space-on .rev,
+body.space-on .prog,
+body.space-on .more,
+body.space-on .seeprog{
+  background:color-mix(in srgb, var(--surface-container-low) 88%, transparent);
+}
+body.space-on .acct{background:color-mix(in srgb, var(--surface-container) 88%, transparent)}
+/* 입력칸·가격·안내 블록은 건드리지 않는다 — 읽는 데 방해가 되면 안 되는 곳이다 */
+
+/* 손가락으로 넘기는 화면(폰·태블릿)에서는 카드를 비치게 두지 않는다.
+   반투명 카드가 고정 배경 위를 지나가면 브라우저가 스크롤 한 프레임마다
+   겹친 색을 다시 계산해야 해, 밀리는 순간 그 자리가 빈다.
+   88% 와 100% 는 눈으로 구별되지 않는다 — 번쩍임과 바꿀 값이 아니다. */
+@media (hover:none){
+  body.space-on .card,
+  body.space-on .step,
+  body.space-on .gift,
+  body.space-on .info,
+  body.space-on .shop,
+  body.space-on .rev,
+  body.space-on .prog,
+  body.space-on .more,
+  body.space-on .seeprog{background:var(--surface-container-low)}
+  body.space-on .acct{background:var(--surface-container)}
+}
+
+/* 움직임을 꺼 둔 분에게는 정지한 밤하늘만 보인다 */
+@media (prefers-reduced-motion:reduce){
+  .space .stars{animation:none !important}
+  .space .met{display:none !important}
+}

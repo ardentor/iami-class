@@ -1,0 +1,104 @@
+/* 프로그램 소개 페이지 전용 — 토큰과 폰트는 apply.css 를 그대로 쓴다.
+   신청서·Q&A 와 같은 옷을 입혀야 고객이 같은 회사로 인식한다. */
+
+.wrap{max-width:600px}
+body{padding-bottom:calc(96px + env(safe-area-inset-bottom))}   /* 하단 고정 버튼 자리 */
+
+/* ── 히어로 ── */
+.hero{margin-top:6px;border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow)}
+.hero img{width:100%;display:block}
+
+/* ── 첫 문단 (So What) ── */
+.sowhat{margin:20px 2px 4px;font-size:16.5px;font-weight:700;line-height:1.55;letter-spacing:-.3px}
+.sowhat + p{margin:8px 2px 0;font-size:13.5px;color:var(--on-surface-variant)}
+
+/* ── 섹션 제목 ── */
+.sec{margin:34px 2px 12px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.sec h2{margin:0;font-size:16px;font-weight:800;letter-spacing:-.3px}
+.sec p{margin:0;font-size:12.5px;color:var(--on-surface-variant)}
+
+/* ── 프로그램 카드 ── */
+.prog{background:var(--surface-container-low);border-radius:var(--r-card);
+  padding:18px 18px 6px;margin-top:12px}
+.prog.lead{background:var(--primary-container);color:var(--on-primary-container)}
+.prog.lead .p-time{background:rgba(0,0,0,.10);color:inherit}
+.prog.lead .p-desc{color:inherit;opacity:.9}
+.prog.lead summary{color:inherit}
+
+.p-top{display:flex;gap:14px;align-items:flex-start}
+.p-thumb{flex:0 0 62px;width:62px;height:62px;border-radius:16px;overflow:hidden;
+  background:var(--surface-container);box-shadow:var(--shadow)}
+.p-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.p-head{flex:1;min-width:0}
+.p-name{margin:0;font-size:16px;font-weight:800;letter-spacing:-.3px}
+.p-time{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:var(--r-pill);
+  background:var(--surface-container-high);color:var(--on-surface-variant);
+  font-size:11.5px;font-weight:600}
+.p-desc{margin:12px 0 0;font-size:14px;line-height:1.7;color:var(--on-surface-variant)}
+
+/* 진행 순서 — 접이식 */
+.p-steps{margin-top:12px;border-top:1px solid var(--outline-variant)}
+.prog.lead .p-steps{border-top-color:rgba(0,0,0,.14)}
+.p-steps summary{list-style:none;cursor:pointer;padding:13px 26px 13px 0;position:relative;
+  font-size:13px;font-weight:700;color:var(--primary)}
+.prog.lead .p-steps summary{color:var(--on-primary-container)}
+.p-steps summary::-webkit-details-marker{display:none}
+.p-steps summary::after{content:'';position:absolute;right:6px;top:18px;width:7px;height:7px;
+  border-right:2px solid currentColor;border-bottom:2px solid currentColor;
+  transform:rotate(45deg);opacity:.7;transition:transform .18s var(--ease)}
+.p-steps[open] summary::after{transform:rotate(-135deg);top:21px}
+
+.p-steps ol{margin:0;padding:0 0 14px;list-style:none;counter-reset:s}
+.p-steps li{position:relative;padding:0 0 14px 34px;counter-increment:s}
+.p-steps li:last-child{padding-bottom:4px}
+.p-steps li::before{content:counter(s);position:absolute;left:0;top:0;
+  width:23px;height:23px;border-radius:50%;display:grid;place-items:center;
+  background:var(--primary);color:var(--on-primary);font-size:11.5px;font-weight:700}
+.prog.lead .p-steps li::before{background:var(--on-primary-container);color:var(--primary-container)}
+.p-steps li b{display:block;font-size:13.5px;font-weight:700;line-height:1.5}
+.p-steps li span{display:block;margin-top:3px;font-size:12.5px;line-height:1.65;
+  color:var(--on-surface-variant)}
+.prog.lead .p-steps li span{color:inherit;opacity:.85}
+
+/* 카드 안 신청 버튼 */
+.p-go{display:block;margin:0 0 16px;padding:12px;border-radius:var(--r-field);
+  background:var(--primary);color:var(--on-primary);text-decoration:none;
+  font-size:13.5px;font-weight:700;text-align:center;
+  transition:transform .16s var(--ease)}
+.p-go:active{transform:scale(.985)}
+.prog.lead .p-go{background:var(--on-primary-container);color:var(--primary-container)}
+
+/* ── 그 밖의 프로그램 (간단 목록) ── */
+.more{background:var(--surface-container-low);border-radius:var(--r-card);padding:6px 18px;margin-top:12px}
+.more div{padding:13px 0;border-top:1px solid var(--outline-variant);
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.more div:first-child{border-top:0}
+.more b{font-size:14px;font-weight:700}
+.more em{font-style:normal;font-size:12px;color:var(--on-surface-variant);white-space:nowrap}
+.more p{margin:4px 0 0;font-size:12.5px;color:var(--on-surface-variant);line-height:1.6}
+
+/* ── 안내 블록 ── */
+.note{background:var(--primary-container);color:var(--on-primary-container);
+  border-radius:var(--r-card);padding:20px;margin-top:12px}
+.note b{display:block;font-size:14.5px;font-weight:800;margin-bottom:8px}
+.note p{margin:0;font-size:13.5px;line-height:1.75;opacity:.92}
+
+/* ── 하단 고정 버튼 ── */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  background:color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--outline-variant)}
+.bar a{display:block;max-width:600px;margin:0 auto;padding:16px;
+  border-radius:var(--r-pill);background:var(--primary);color:var(--on-primary);
+  text-decoration:none;text-align:center;font-size:15.5px;font-weight:800;
+  box-shadow:var(--shadow);transition:transform .16s var(--ease)}
+.bar a:active{transform:scale(.985)}
+
+/* ── 푸터 ── */
+.foot{margin-top:34px;padding:20px 4px 0;border-top:1px solid var(--outline-variant);
+  font-size:11.5px;line-height:1.9;color:var(--on-surface-variant);text-align:center}
+.foot a{color:var(--primary);font-weight:600;text-decoration:none}
+.foot .biz{margin-top:8px;opacity:.85}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}

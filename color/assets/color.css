@@ -1,0 +1,386 @@
+/* 퍼스널컬러 결과 자료 — 고객이 컨설팅 후 받아 보는 개인 자료 화면.
+   2026-08-03 신설. 노션 공개 페이지(narrow-polyester-40b.notion.site)를 대체한다.
+
+   🔴 모바일이 기본이다. 고객은 문자로 링크를 받으므로 십중팔구 폰으로 연다.
+      옛 노션 자료는 5열 컬럼 레이아웃이라 폰에서 무너졌고, 그래서 맨 위에
+      "*pc 크롬 브라우저로 보시는 게 가장 좋습니다" 라는 안내가 붙어 있었다.
+      그 문장을 지우는 것이 이 화면의 목적이다.
+
+   토큰 값은 assets/apply.css 와 같다 — 신청서와 다른 회사처럼 보이면 안 된다.
+   다만 파일은 자립시켰다. 신청서 폼 스타일이 여기까지 따라오면 안 되기 때문이다. */
+
+@font-face{font-family:'Paperlogy';font-weight:400;font-display:swap;
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-4Regular.woff2') format('woff2')}
+@font-face{font-family:'Paperlogy';font-weight:600;font-display:swap;
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-6SemiBold.woff2') format('woff2')}
+@font-face{font-family:'Paperlogy';font-weight:700;font-display:swap;
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-7Bold.woff2') format('woff2')}
+@font-face{font-family:'Paperlogy';font-weight:800;font-display:swap;
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2') format('woff2')}
+
+:root{
+  --primary:#1456f0; --on-primary:#fff;
+  --primary-container:#dde1ff; --on-primary-container:#001551;
+  --surface:#fbf8ff; --on-surface:#1a1b21;
+  --surface-container-low:#f5f2fa; --surface-container:#efedf4; --surface-container-high:#e9e7ef;
+  --on-surface-variant:#45464f; --outline:#767680; --outline-variant:#c6c5d0;
+  --ok:#0f7b3d; --warn:#8a5a00; --off:#767680;
+  --ease:cubic-bezier(.2,0,0,1);
+  --r-card:20px; --r-pill:100px;
+  /* 컬러별 액센트 — 각 페이지가 <body data-accent> 로 덮어쓴다 */
+  --accent:#f0a882; --accent-soft:#fff1e8;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --primary:#b6c4ff; --on-primary:#00287c;
+    --primary-container:#003bae; --on-primary-container:#dde1ff;
+    --surface:#111318; --on-surface:#e3e1e9;
+    --surface-container-low:#1a1b21; --surface-container:#1e1f25; --surface-container-high:#282a2f;
+    --on-surface-variant:#c6c5d0; --outline:#90909a; --outline-variant:#45464f;
+    --ok:#7ddc9f; --warn:#f2c26b; --off:#90909a;
+    --accent-soft:#2a2119;
+  }
+}
+
+/* ── 계절 배경 (벚꽃 등) ───────────────────────────────
+   🔴 fixed + pointer-events:none 이 핵심이다. 스크롤해도 따라오고,
+      배경 위를 눌러도 카드가 정상으로 눌린다.
+   🔴 z-index 0 에 두고 본문은 1 이상으로 올린다. 배경이 글자를 덮으면 안 된다. */
+.petals{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.petals canvas{display:block;width:100%;height:100%}
+/* 본문은 배경 위로. 상단바·탭은 이미 sticky 라 그 위에 있다. */
+.topbar,.hero,.tabs,main,footer,.top{position:relative;z-index:1}
+.topbar{z-index:40}
+.tabs{z-index:30}
+.top{z-index:50}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--surface); color:var(--on-surface);
+  font-family:'Paperlogy',-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-weight:400; line-height:1.65; word-break:keep-all;
+  padding-bottom:calc(48px + env(safe-area-inset-bottom));
+}
+a{color:inherit}
+img{display:block;max-width:100%}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+
+/* ── 상단 바 ───────────────────────────────────────────── */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  background:color-mix(in srgb,var(--surface) 88%,transparent);
+  backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--outline-variant);
+}
+.topbar .wrap{display:flex;align-items:center;gap:10px;height:52px}
+.topbar .home{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:14px;font-weight:600;color:var(--primary);text-decoration:none;
+}
+.topbar .now{margin-left:auto;font-size:12px;color:var(--on-surface-variant)}
+
+/* ── 히어로 ────────────────────────────────────────────── */
+.hero{padding:28px 0 20px;background:linear-gradient(180deg,var(--accent-soft),transparent)}
+.hero .en{
+  margin:0;font-size:clamp(28px,8vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.12;
+}
+.hero .ko{margin:6px 0 0;font-size:15px;font-weight:600;color:var(--on-surface-variant)}
+.hero .lead{margin:14px 0 0;font-size:15px;color:var(--on-surface-variant);max-width:44em}
+.chip{
+  display:inline-block;margin-top:14px;padding:5px 12px;border-radius:var(--r-pill);
+  background:var(--accent);color:#2b1b10;font-size:12px;font-weight:700;
+}
+
+/* ── 갱신 안내 (2026-08-04) ────────────────────────────
+   자기 컬러의 갱신 일정만 말한다. 자료가 살아 있다는 표시라
+   눈에는 띄되 제품보다 앞서 보이면 안 된다 — 그래서 테두리만 준다. */
+.fresh{
+  display:flex;gap:10px;align-items:flex-start;
+  margin:16px 0 0;padding:12px 14px;border-radius:14px;
+  border:1px solid var(--outline-variant);background:var(--surface-container-low);
+}
+.fresh .ic{font-size:15px;line-height:1.4;flex:none}
+.fresh .t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.fresh strong{font-size:13.5px;font-weight:700;color:var(--on-surface)}
+.fresh strong.ok{color:#16794a}
+.fresh .s{font-size:12.5px;color:var(--on-surface-variant);line-height:1.55}
+.fresh.done{border-color:color-mix(in srgb,#16794a 35%,var(--outline-variant))}
+@media (prefers-color-scheme:dark){
+  .fresh strong.ok{color:#5fd39b}
+  .fresh.done{border-color:color-mix(in srgb,#5fd39b 30%,var(--outline-variant))}
+}
+
+/* ── 이용 기간이 지난 파트너 판 ────────────────────────── */
+.expired{
+  margin:40px 0;padding:32px 20px;border-radius:16px;text-align:center;
+  border:1px solid var(--outline-variant);background:var(--surface-container-low);
+}
+.expired strong{display:block;font-size:17px;font-weight:800;margin-bottom:10px}
+.expired p{margin:0;font-size:14px;color:var(--on-surface-variant);line-height:1.7}
+.topbar .home.plain{cursor:default;text-decoration:none}
+
+/* ── 저작권 (접이식) ───────────────────────────────────── */
+.notice{
+  margin:18px 0 0;border:1px solid var(--outline-variant);border-radius:14px;
+  background:var(--surface-container-low);overflow:hidden;
+}
+.notice summary{
+  cursor:pointer;padding:12px 14px;font-size:13px;font-weight:600;
+  color:var(--on-surface-variant);list-style:none;
+}
+.notice summary::-webkit-details-marker{display:none}
+.notice summary::after{content:' ▾';color:var(--outline)}
+.notice[open] summary::after{content:' ▴'}
+.notice .body{padding:0 14px 14px;font-size:13px;color:var(--on-surface-variant)}
+.notice .body p{margin:0 0 8px}
+
+/* ── 탭 (가로 스크롤 · 고정) ───────────────────────────── */
+.tabs{
+  position:sticky; top:52px; z-index:30; margin-top:18px;
+  background:color-mix(in srgb,var(--surface) 92%,transparent);
+  backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--outline-variant);
+}
+.tabs .row{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:none}
+.tabs .row::-webkit-scrollbar{display:none}
+.tabs a{
+  flex:0 0 auto;padding:7px 14px;border-radius:var(--r-pill);text-decoration:none;
+  font-size:13px;font-weight:600;white-space:nowrap;
+  background:var(--surface-container);color:var(--on-surface-variant);
+  border:1px solid transparent;transition:.15s var(--ease);
+}
+.tabs a.on{background:var(--primary);color:var(--on-primary)}
+
+/* ── 섹션 ──────────────────────────────────────────────── */
+section{padding:30px 0 6px;scroll-margin-top:104px}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin:0 0 14px}
+.sec-h h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-.01em}
+.sec-h .n{font-size:13px;color:var(--on-surface-variant)}
+/* 다른 컬러에서 끌어온 섹션에는 왜 여기 있는지 한 줄 붙인다 */
+.sec-note{margin:-6px 0 14px;font-size:13.5px;color:var(--on-surface-variant);max-width:44em}
+
+/* ── 제품 카드 ─────────────────────────────────────────── */
+.grid{
+  display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+}
+.card{
+  display:flex;flex-direction:column;text-decoration:none;
+  background:var(--surface-container-low);border-radius:var(--r-card);
+  border:1px solid var(--outline-variant);overflow:hidden;
+  transition:transform .15s var(--ease),box-shadow .15s var(--ease);
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.10)}
+.card .ph{
+  position:relative;aspect-ratio:1/1;background:var(--surface-container-high);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.card .ph .noimg{font-size:12px;color:var(--outline);font-weight:600;padding:0 10px;text-align:center}
+.card .txt{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.card .brand{font-size:11px;font-weight:700;color:var(--primary);letter-spacing:.02em}
+.card .name{font-size:13px;font-weight:600;line-height:1.4}
+.card .go{
+  margin-top:auto;padding-top:8px;font-size:12px;font-weight:600;color:var(--on-surface-variant);
+}
+.card .go::after{content:' →'}
+/* 여러 매체가 겹쳐 추천한 제품 — 고르는 근거가 되므로 눈에 띄게 둔다 */
+.card .refs{
+  align-self:flex-start;margin-top:2px;padding:2px 8px;border-radius:var(--r-pill);
+  background:var(--primary-container);color:var(--on-primary-container);
+  font-size:11px;font-weight:700;
+}
+
+/* 상태 배지 — 「판매중」은 굳이 표시하지 않는다 (대부분이라 소음이 된다) */
+.badge{
+  position:absolute;left:8px;top:8px;padding:3px 8px;border-radius:var(--r-pill);
+  font-size:11px;font-weight:700;background:var(--surface);color:var(--on-surface-variant);
+  border:1px solid var(--outline-variant);
+}
+.badge.gone{color:#fff;background:var(--off);border-color:transparent}
+.badge.back{color:#fff;background:var(--ok);border-color:transparent}
+.card.gone .ph img{filter:grayscale(1);opacity:.55}
+
+/* ── 헤어 컬러 (사진 없이 이름 + 영상) ─────────────────
+   AI 로 만든 인물컷이 어색해 걷어냈다. 색 이름은 칩으로, 발색은 영상으로. */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip-h{
+  padding:9px 16px;border-radius:var(--r-pill);
+  background:var(--accent-soft);border:1px solid var(--outline-variant);
+  font-size:14px;font-weight:700;color:var(--on-surface);
+}
+.hair-note{
+  margin:14px 0 14px;font-size:13px;color:var(--on-surface-variant);
+}
+
+/* ── 진단 속성 (눌러서 펼치는 카드) ────────────────────── */
+.notes{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.note{
+  background:var(--surface-container-low);border:1px solid var(--outline-variant);
+  border-radius:var(--r-card);overflow:hidden;align-self:start;
+}
+.note summary{
+  cursor:pointer;padding:15px 18px;font-size:15px;font-weight:700;list-style:none;
+  display:flex;align-items:center;gap:8px;
+}
+.note summary::-webkit-details-marker{display:none}
+.note summary::after{content:'▾';margin-left:auto;color:var(--outline);font-weight:400}
+.note[open] summary::after{content:'▴'}
+.note[open] summary{border-bottom:1px solid var(--outline-variant)}
+.note .body{padding:14px 18px 18px}
+.note p{margin:0;font-size:14px;color:var(--on-surface-variant);white-space:pre-line}
+.note .imgs{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.note .imgs img{width:100%;border-radius:12px;border:1px solid var(--outline-variant)}
+
+/* ── 영상 카드 ─────────────────────────────────────────── */
+.grid.video{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.grid.video .ph{aspect-ratio:16/9;background:#000}
+.grid.video .ph img{object-fit:cover}
+.card.vid .play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:46px;height:46px;border-radius:50%;
+  background:rgba(0,0,0,.62);color:#fff;font-size:15px;
+  display:flex;align-items:center;justify-content:center;
+  padding-left:3px;pointer-events:none;
+}
+.card.vid .meta{
+  position:absolute;right:8px;bottom:8px;padding:3px 7px;border-radius:6px;
+  background:rgba(0,0,0,.72);color:#fff;font-size:11px;font-weight:600;pointer-events:none;
+}
+.card.vid .name{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* ── 긴 해설 (메이크업·향수) ───────────────────────────── */
+/* 해설은 대상 섹션 바로 위에 온다 — 섹션 사이 간격만 맞춰 준다 */
+.essay-wrap{padding-top:26px}
+.essay-wrap+section{padding-top:8px}
+.essay{
+  background:var(--surface-container-low);border:1px solid var(--outline-variant);
+  border-radius:var(--r-card);overflow:hidden;margin-bottom:14px;
+}
+.essay summary{
+  cursor:pointer;padding:15px 18px;font-size:15px;font-weight:700;list-style:none;
+}
+.essay summary::-webkit-details-marker{display:none}
+.essay summary::after{content:' ▾';color:var(--outline);font-weight:400}
+.essay[open] summary::after{content:' ▴'}
+.essay .body{padding:0 18px 18px;font-size:14px;color:var(--on-surface-variant)}
+.essay .body h4{margin:16px 0 6px;font-size:14px;font-weight:700;color:var(--on-surface)}
+.essay .body ul{margin:0;padding-left:18px}
+.essay .body li{margin:4px 0}
+
+/* ── 진단 이후 (계속 이어지는 자리) ────────────────────
+   옛 노션의 링크 목록을 대신한다. 이름만 나열하지 않고
+   「무엇을 받게 되는지」를 한 줄씩 붙여 카드로 세운다. */
+.next{padding-top:34px}
+.next .sec-h h2{font-size:19px;line-height:1.4}
+.next-lead{
+  margin:-4px 0 18px;font-size:14.5px;color:var(--on-surface-variant);max-width:44em;
+}
+.next-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.nx{
+  display:flex;flex-direction:column;gap:6px;text-decoration:none;
+  padding:16px 18px;border-radius:var(--r-card);
+  background:var(--surface-container-low);border:1px solid var(--outline-variant);
+  transition:transform .15s var(--ease),box-shadow .15s var(--ease);
+}
+.nx:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.10)}
+.nx-t{font-size:15px;font-weight:700}
+.nx-d{font-size:13.5px;color:var(--on-surface-variant);line-height:1.6}
+.nx-go{margin-top:6px;font-size:12.5px;font-weight:700;color:var(--primary)}
+.nx-go::after{content:' →'}
+/* 가장 먼저 눌러 주셨으면 하는 둘 — 소식 받기와 재예약 */
+.nx-key{
+  background:var(--primary-container);border-color:transparent;
+}
+.nx-key .nx-t,.nx-key .nx-d{color:var(--on-primary-container)}
+.nx-key .nx-go{color:var(--on-primary-container)}
+.next-end{
+  margin:20px 0 0;font-size:14.5px;color:var(--on-surface-variant);
+}
+
+/* ── 푸터 ──────────────────────────────────────────────── */
+footer{
+  margin-top:44px;padding:24px 0 32px;border-top:1px solid var(--outline-variant);
+  font-size:13px;color:var(--on-surface-variant);
+}
+footer .links{display:flex;flex-wrap:wrap;gap:8px 16px;margin:10px 0 0}
+footer a{color:var(--primary);text-decoration:none;font-weight:600}
+footer .c{margin-top:14px;font-size:12px;color:var(--outline)}
+
+/* ── 맨 위로 ───────────────────────────────────────────── */
+.top{
+  position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:50;
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--outline-variant);
+  background:var(--surface-container);color:var(--on-surface);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  opacity:0;pointer-events:none;transition:opacity .2s var(--ease);
+  box-shadow:0 4px 14px rgba(0,0,0,.14);font-size:17px;
+}
+.top.show{opacity:1;pointer-events:auto}
+
+.loading,.failed{padding:40px 0;text-align:center;color:var(--on-surface-variant);font-size:14px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ── 골격별 코디 (2026-08-05) ─────────────────────────────────────
+   같은 컬러라도 골격에 따라 답이 갈린다. 탭으로 자기 것만 보여 준다.
+   🚫 세 개를 한꺼번에 펼치지 않는다 — 남의 골격 글까지 읽으면 오히려 헷갈린다. */
+.ftabs{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+.ftab{
+  border:1px solid var(--outline-variant);background:var(--surface-container-low);
+  color:var(--on-surface-variant);font:inherit;font-size:14px;font-weight:700;
+  padding:9px 18px;border-radius:var(--r-pill);cursor:pointer;
+  transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease);
+}
+.ftab:hover{background:var(--surface-container)}
+.ftab.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+
+.fpane{display:none}
+.fpane.on{display:block}
+
+.fhint{
+  margin:0 0 14px;font-size:13.5px;line-height:1.65;
+  color:var(--on-surface-variant);max-width:44em;
+}
+.ftips{margin:0 0 16px;padding:0;list-style:none;display:grid;gap:10px;max-width:46em}
+.ftips li{
+  position:relative;padding-left:16px;font-size:15px;line-height:1.7;
+}
+.ftips li::before{
+  content:'';position:absolute;left:0;top:.62em;
+  width:6px;height:6px;border-radius:50%;background:var(--accent);
+}
+.ftips b{font-weight:800}
+
+.fpoint{
+  display:flex;gap:12px;align-items:baseline;
+  background:var(--surface-container-low);border-left:4px solid var(--accent);
+  border-radius:12px;padding:13px 16px;margin:0 0 18px;max-width:46em;
+}
+.fpoint b{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.02em}
+.fpoint span{font-size:15px;font-weight:700;line-height:1.6}
+
+.fsub{
+  font-size:13px;font-weight:800;color:var(--on-surface-variant);
+  margin:0 0 10px;letter-spacing:.01em;
+}
+.finsta{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));margin:0 0 18px}
+.igc{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--surface-container-low);border:1px solid var(--outline-variant);
+  border-radius:14px;padding:12px 14px;transition:background .18s var(--ease);
+}
+.igc:hover{background:var(--surface-container)}
+.igc b{display:block;font-size:14.5px;font-weight:800}
+.igc span{display:block;margin-top:3px;font-size:12.5px;color:var(--on-surface-variant);line-height:1.5}
+
+.fupd{
+  margin:16px 0 0;font-size:12px;color:var(--outline);
+  padding-top:12px;border-top:1px solid var(--outline-variant);
+}

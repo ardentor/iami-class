@@ -1,0 +1,73 @@
+/* 원데이클래스 소개 페이지 전용 — 토큰·폰트는 apply.css, 골격은 program.css 를 따른다.
+   전문가 대상 페이지라 고객용(women/men)보다 정보 밀도를 높게 가져간다. */
+
+/* ── 후기 영상 ── */
+.video{margin-top:12px;border-radius:var(--r-card);overflow:hidden;background:#000;
+  box-shadow:var(--shadow)}
+.video iframe{display:block;width:100%;height:640px;border:0;background:#000}
+/* 세로 영상(9:16). 화면이 넓어도 세로로 길어지지 않게 최대 높이를 묶는다. */
+.video video{display:block;width:100%;max-height:78vh;aspect-ratio:9/16;
+  object-fit:contain;border:0;background:#000}
+.video-cap{margin:10px 4px 0;font-size:12.5px;color:var(--on-surface-variant);text-align:center}
+.video-cap a{color:var(--primary);font-weight:600;text-decoration:none}
+
+/* ── 후기 카드 ── */
+.rev{background:var(--surface-container-low);border-radius:var(--r-card);padding:18px 20px;margin-top:10px}
+.rev p{margin:0;font-size:13.5px;line-height:1.75}
+.rev cite{display:block;margin-top:9px;font-style:normal;font-size:12px;font-weight:700;
+  color:var(--primary)}
+.rev-more{margin:14px 2px 0;font-size:12.5px;color:var(--on-surface-variant);text-align:center}
+
+/* 만족도 */
+.stat{background:var(--primary-container);color:var(--on-primary-container);
+  border-radius:var(--r-card);padding:22px;margin-top:12px;text-align:center}
+.stat b{display:block;font-size:38px;font-weight:800;letter-spacing:-1.5px;line-height:1.2}
+.stat span{display:block;margin-top:6px;font-size:13.5px;opacity:.9}
+
+/* 별점 — 뒤에 빈 별 5개를 깔고 앞의 채운 별을 퍼센트만큼만 보여준다.
+   .stars-fg 의 width 가 곧 만족도 숫자다. 숫자를 고치면 여기도 같이 고친다. */
+.stat .stars{position:relative;display:inline-block;margin-bottom:9px;
+  font-size:25px;line-height:1;letter-spacing:3px;white-space:nowrap}
+/* 마지막 별 뒤에도 자간이 붙어 폭이 부풀면 98% 가 100% 처럼 칠해진다. 그만큼 되돌린다. */
+.stat .stars-bg{display:block;opacity:.26;margin-right:-3px}
+.stat .stars-fg{position:absolute;left:0;top:0;display:block;overflow:hidden;
+  color:#f5a623;text-shadow:0 1px 2px rgba(0,0,0,.12)}
+.stat .stars span{display:block;margin:0;font-size:inherit;opacity:inherit}
+
+/* ── 커리큘럼 단계 ── */
+.step{background:var(--surface-container-low);border-radius:var(--r-card);
+  padding:18px 20px;margin-top:10px;display:flex;gap:15px;align-items:flex-start}
+.step i{flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:var(--primary);color:var(--on-primary);
+  font-style:normal;font-size:13px;font-weight:800}
+.step div{flex:1;min-width:0}
+.step b{display:block;font-size:15px;font-weight:800;letter-spacing:-.3px}
+.step p{margin:6px 0 0;font-size:13.5px;line-height:1.7;color:var(--on-surface-variant)}
+
+/* ── 혜택 ── */
+.gift{background:var(--surface-container-low);border-radius:var(--r-card);padding:6px 20px;margin-top:12px}
+.gift div{padding:14px 0;border-top:1px solid var(--outline-variant);display:flex;gap:12px;align-items:flex-start}
+.gift div:first-child{border-top:0}
+.gift em{flex:0 0 auto;font-style:normal;font-size:12px;font-weight:800;color:var(--primary);
+  padding-top:1px}
+.gift b{display:block;font-size:14px;font-weight:700}
+.gift p{margin:3px 0 0;font-size:12.5px;line-height:1.65;color:var(--on-surface-variant)}
+
+/* ── 일정·가격 표 ── */
+.info{background:var(--surface-container-low);border-radius:var(--r-card);padding:6px 20px;margin-top:12px}
+.info div{padding:13px 0;border-top:1px solid var(--outline-variant);display:flex;gap:14px}
+.info div:first-child{border-top:0}
+.info b{flex:0 0 74px;font-size:13px;font-weight:700;color:var(--on-surface-variant)}
+.info span{flex:1;font-size:13.5px;line-height:1.6}
+
+/* ── 함께 보는 것 (스토어·자료) ── */
+.shop{background:var(--surface-container-low);border-radius:var(--r-card);padding:6px 18px;margin-top:12px}
+.shop a{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:15px 0;border-top:1px solid var(--outline-variant);
+  color:inherit;text-decoration:none}
+.shop a:first-child{border-top:0}
+.shop b{display:block;font-size:14px;font-weight:700}
+.shop p{margin:3px 0 0;font-size:12.5px;color:var(--on-surface-variant);line-height:1.6}
+.shop i{flex:0 0 auto;font-style:normal;font-size:12.5px;font-weight:700;color:var(--primary)}
+
+@media (max-width:420px){ .video iframe{height:560px} }
